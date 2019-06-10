@@ -83,7 +83,7 @@ func fusecmdCallback(f *pflag.Flag, cfg *singularity.EngineConfig) {
 	config := pluginConfig{
 		Fuse: FuseConfig{
 			MountPoint: mnt,
-			Program:    []string{fuseExampleDriver},
+			Program:    []string{fuseExampleDriver, "-f"},
 		},
 	}
 	if err := cfg.SetPluginConfig(Plugin.Manifest.Name, config); err != nil {
