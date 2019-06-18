@@ -21,7 +21,7 @@ var Plugin = pluginapi.Plugin{
 	Manifest: pluginapi.Manifest{
 		Name:        "github.com/mem/singularity-fusemnt",
 		Author:      "Marcelo E. Magallon",
-		Version:     "0.0.1",
+		Version:     "0.0.2",
 		Description: "Singularity plugin allowing the user to mount a FUSE example filesystem",
 	},
 
@@ -71,13 +71,17 @@ func fusecmdCallback(f *pflag.Flag, cfg *singularity.EngineConfig) {
 	// singularity takes care of obtaining a file descriptor for
 	// /dev/fuse, fusermount is not really needed.
 
+	bindPaths := cfg.GetBindPath()
+	bindPaths = append(bindPaths, "/bin/true:/bin/fusermount")
+
 	fuseExampleDriver, err := exec.LookPath("fuse-example")
 	if err != nil {
-		sylog.Fatalf("Cannot find the fuse-example driver in $PATH. Abort.\n")
+		sylog.Warningf("Cannot find the fuse-example driver in $PATH.\n")
+		fuseExampleDriver = "/bin/fuse-example"
+	} else {
+		bindPaths = append(bindPaths, fuseExampleDriver)
 	}
 
-	bindPaths := cfg.GetBindPath()
-	bindPaths = append(bindPaths, "/bin/true:/bin/fusermount", fuseExampleDriver)
 	cfg.SetBindPath(bindPaths)
 
 	config := pluginConfig{
